@@ -1,9 +1,12 @@
 use super::ray::Ray;
 use super::vec3::{self, Point3, Vec3};
+use std::rc::Rc;
+use super::material::Material;
 
 #[derive(Clone, Default)]
 pub struct HitRecord {
     pub p: Point3,
+    pub mat: Option<Rc<dyn Material>>,
     pub normal: Vec3,
     pub t: f64,
     pub front_face: bool,

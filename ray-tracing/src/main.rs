@@ -4,12 +4,13 @@ use ray_tracing::shapes::color::Color;
 use ray_tracing::shapes::common;
 use ray_tracing::shapes::hittable::{HitRecord, Hittable};
 use ray_tracing::shapes::hittable_list::HittableList;
+use ray_tracing::shapes::material::{Dielectric, Lambertian, Metal};
 use ray_tracing::shapes::ray::Ray;
 use ray_tracing::shapes::sphere::Sphere;
 use ray_tracing::shapes::vec3;
 use ray_tracing::shapes::vec3::Point3;
 use std::io;
-
+use std::rc::Rc;
 // Comprendre les concepts
 // Sphère dans un espace 3D : Une sphère est définie par un point central  C et un rayon  R.
 //L'équation de la sphère est :
@@ -33,12 +34,21 @@ fn ray_color(r: &Ray, world: &dyn Hittable, depth: i32) -> Color {
     // Élimination de l'acné des ombres
     // Problème : Les rayons réfléchis peuvent heurter la surface d'origine à une distance proche de zéro (
     // t≈0), créant des artefacts visuels appelés acné des ombres.
-    // Solution : Ignorer les collisions très proches de t=0.0 
+    // Solution : Ignorer les collisions très proches de t=0.0
     // en utilisant une tolérance minimale (t>0.001).
 
     if world.hit(r, 0.001, common::INFINITY, &mut rec) {
-        let direction = rec.normal + vec3::random_unit_vector();
-        return 0.5 * ray_color(&Ray::new(rec.p, direction), world, depth - 1);
+        let mut attenuation = Color::default();
+        let mut scattered = Ray::default();
+        if rec
+            .mat
+            .as_ref()
+            .unwrap()
+            .scatter(r, &rec, &mut attenuation, &mut scattered)
+        {
+            return attenuation * ray_color(&scattered, world, depth - 1);
+        }
+        return Color::new(0.0, 0.0, 0.0);
     }
 
     let unit_direction = vec3::unit_vector(r.direction());
@@ -60,8 +70,31 @@ fn main() {
 
     // World
     let mut world = HittableList::new();
-    world.add(Box::new(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5)));
-    world.add(Box::new(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0)));
+    let material_ground = Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
+    let material_center = Rc::new(Lambertian::new(Color::new(0.1, 0.2, 0.5)));
+    let material_left = Rc::new(Dielectric::new(1.5));
+    let material_right = Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 0.0));
+
+    world.add(Box::new(Sphere::new(
+        Point3::new(0.0, -100.5, -1.0),
+        100.0,
+        material_ground,
+    )));
+    world.add(Box::new(Sphere::new(
+        Point3::new(0.0, 0.0, -1.0),
+        0.5,
+        material_center,
+    )));
+    world.add(Box::new(Sphere::new(
+        Point3::new(-1.0, 0.0, -1.0),
+        0.5,
+        material_left.clone(),
+    )));
+    world.add(Box::new(Sphere::new(
+        Point3::new(-1.0, 0.0, -1.0),
+        -0.4,
+        material_left,
+    )));
     
     // Camera
 

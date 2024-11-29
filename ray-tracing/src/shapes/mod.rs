@@ -5,4 +5,5 @@ pub mod sphere;
 pub mod hittable;
 pub mod hittable_list;
 pub mod common;
-pub  mod camera;
+pub mod camera;
+pub mod material;

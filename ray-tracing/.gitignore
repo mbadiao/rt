@@ -1,0 +1,13 @@
+# Rust spécifique
+target/
+*.rs.bk
+Cargo.lock
+
+# Fichiers de build
+debug/
+release/
+
+# Fichiers générés
+*.ppm
+*.png
+*.jpg
