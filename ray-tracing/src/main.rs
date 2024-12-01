@@ -2,12 +2,13 @@ use ray_tracing::shapes::camera::Camera;
 use ray_tracing::shapes::color;
 use ray_tracing::shapes::color::Color;
 use ray_tracing::shapes::common;
+use ray_tracing::shapes::cylinder::Cylinder;
 use ray_tracing::shapes::hittable::{HitRecord, Hittable};
 use ray_tracing::shapes::hittable_list::HittableList;
 use ray_tracing::shapes::material::{Dielectric, Lambertian, Metal};
 use ray_tracing::shapes::ray::Ray;
-use ray_tracing::shapes::sphere::Sphere;
-use ray_tracing::shapes::{vec3,vec3::Point3};
+use ray_tracing::shapes::{cube::Cube, sphere::Sphere};
+use ray_tracing::shapes::{vec3, vec3::Point3};
 use std::io;
 use std::rc::Rc;
 // Comprendre les concepts
@@ -27,7 +28,7 @@ fn ray_color(r: &Ray, world: &dyn Hittable, depth: i32) -> Color {
     if depth <= 0 {
         return Color::new(0.0, 0.0, 0.0);
     }
-    
+
     let mut rec = HitRecord::new();
 
     // Élimination de l'acné des ombres
@@ -57,14 +58,14 @@ fn ray_color(r: &Ray, world: &dyn Hittable, depth: i32) -> Color {
 
 // fn random_scene() -> HittableList {
 //     let mut world = HittableList::new();
- 
+
 //     let ground_material = Rc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
 //     world.add(Box::new(Sphere::new(
 //         Point3::new(0.0, -1000.0, 0.0),
 //         1000.0,
 //         ground_material,
 //     )));
- 
+
 //     for a in -5..5 {
 //         for b in -5..5 {
 //             let choose_mat = common::random_double();
@@ -73,7 +74,7 @@ fn ray_color(r: &Ray, world: &dyn Hittable, depth: i32) -> Color {
 //                 0.2,
 //                 b as f64 + 0.9 * common::random_double(),
 //             );
- 
+
 //             if (center - Point3::new(4.0, 0.2, 0.0)).length() > 0.9 {
 //                 if choose_mat < 0.8 {
 //                     // Diffuse
@@ -94,28 +95,28 @@ fn ray_color(r: &Ray, world: &dyn Hittable, depth: i32) -> Color {
 //             }
 //         }
 //     }
- 
+
 //     let material1 = Rc::new(Dielectric::new(1.5));
 //     world.add(Box::new(Sphere::new(
 //         Point3::new(0.0, 1.0, 0.0),
 //         1.0,
 //         material1,
 //     )));
- 
+
 //     let material2 = Rc::new(Lambertian::new(Color::new(0.4, 0.2, 0.1)));
 //     world.add(Box::new(Sphere::new(
 //         Point3::new(-4.0, 1.0, 0.0),
 //         1.0,
 //         material2,
 //     )));
- 
+
 //     let material3 = Rc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
 //     world.add(Box::new(Sphere::new(
 //         Point3::new(4.0, 1.0, 0.0),
 //         1.0,
 //         material3,
 //     )));
- 
+
 //     world
 // }
 
@@ -124,7 +125,7 @@ fn main() {
 
     // Définit un ratio d’aspect de 16:9 (largeur/hauteur).
     const ASPECT_RATIO: f64 = 3.0 / 2.0;
-    const IMAGE_WIDTH: i32 = 100;
+    const IMAGE_WIDTH: i32 = 300;
 
     //  Dimensions de l'image en pixels. Ici, largeur = 400 pixels, hauteur = 400/(16/9)=225 pixels.
     const IMAGE_HEIGHT: i32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as i32;
@@ -132,42 +133,71 @@ fn main() {
     const MAX_DEPTH: i32 = 50;
 
     // World
-    
     let mut world = HittableList::new();
- 
+
+    // Ground material
     let ground_material = Rc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
-    let metal = Rc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
-    let _diffus = Rc::new(Lambertian::new(Color::new(0.2,0.1,0.3)));
-    let _glass = Rc::new(Dielectric::new(1.4));
-    world.add(Box::new(Sphere::new(
-        Point3::new(0.0, -1000.0, 0.0),
-        1000.0,
+
+    // Other materials
+    let _metal_material = Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 0.3)); // gold-like metal
+    let _glass_material = Rc::new(Dielectric::new(1.5));
+    let _diffus_material = Rc::new(Lambertian::new(Color::new(0.2, 0.3, 0.4)));
+
+    // Large flat cube (ground)
+    world.add(Box::new(Cube::new(
+        Point3::new(-1000.0, -0.5, -1000.0), // Minimum corner (large negative values)
+        Point3::new(1000.0, 0.0, 1000.0),    // Maximum corner (flat ground plane)
         ground_material,
     )));
 
-    world.add(Box::new(Sphere::new(
-        Point3::new(-4.0, 1.0, 0.0),
-        1.0,
-        metal.clone(),
+    // Add geometric shapes on top of the "ground"
+
+    // Sphere 1: Metallic
+    // world.add(Box::new(Sphere::new(
+    //     Point3::new(0.0, 1.0, -4.0), // Center of the sphere
+    //     1.0,                         // Radius
+    //     metal_material.clone(),
+    // )));
+
+    // Sphere 2: Glass
+    // world.add(Box::new(Sphere::new(
+    //     Point3::new(-2.0, 1.0, -6.0), // Center of the sphere
+    //     1.0,                          // Radius
+    //     glass_material.clone(),
+    // )));
+
+    // Small Cube: Diffuse
+    // world.add(Box::new(Cube::new(
+    //     Point3::new(2.0, 0.0, -4.0), // Minimum corner of the small cube
+    //     Point3::new(3.0, 1.0, -3.0), // Maximum corner of the small cube
+    //     diffus_material.clone(),
+    // )));
+
+    // Define the material for the cylinder
+    let cylinder_material = Rc::new(Lambertian::new(Color::new(0.8, 0.2, 0.2))); // Red diffuse material
+
+    // Define the base center of the cylinder, radius, height, and axis
+    let base = Point3::new(4.0, -1.0, -5.0); // The base of the cylinder is at (0, -1, -5)
+    let radius = 1.0; // The radius of the cylinder is 1.0
+    let height = 3.0; // The height of the cylinder is 3.0
+    let axis = vec3::Vec3::new(0.0, 1.0, 0.0); // The cylinder's axis is along the Y-axis
+
+    // Add the cylinder to the world
+    world.add(Box::new(Cylinder::new(
+        base,
+        radius,
+        height,
+        axis,
+        cylinder_material,
     )));
-    world.add(Box::new(Sphere::new(
-        Point3::new(4.0, 1.0, 0.0),
-        1.0,
-        metal.clone(),
-    )));
-    world.add(Box::new(Sphere::new(
-        Point3::new(8.0, 1.0, 0.0),
-        1.0,
-        metal,
-    )));
-    // Camera
-    
-    let lookfrom = Point3::new(13.0, 2.0, 3.0);
-    let lookat = Point3::new(0.0, 0.0, 0.0);
+
+    // Camera setup
+    let lookfrom = Point3::new(10.0, 3.0, 10.0);
+    let lookat = Point3::new(0.0, 1.0, -5.0);
     let vup = Point3::new(0.0, 1.0, 0.0);
     let dist_to_focus = 10.0;
     let aperture = 0.1;
- 
+
     let cam = Camera::new(
         lookfrom,
         lookat,

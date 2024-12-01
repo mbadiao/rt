@@ -1,5 +1,5 @@
 use std::fmt::{Display, Formatter, Result};
-use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub};
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub,Index};
 use super::common;
 #[derive(Copy, Clone, Default)]
 pub struct Vec3 {
@@ -43,7 +43,22 @@ impl Vec3 {
     pub fn length(&self) -> f64 {
         f64::sqrt(self.length_squared())
     }
- 
+
+    pub fn normalize(&self) -> Vec3 {
+        let len = self.length();
+        
+        // Éviter une division par zéro
+        if len == 0.0 {
+            return Vec3::new(0.0, 0.0, 0.0);
+        }
+        
+        Vec3::new(
+            self.x() / len,
+            self.y() / len,
+            self.z() / len
+        )
+    }
+
     pub fn length_squared(&self) -> f64 {
         self.e[0] * self.e[0] + self.e[1] * self.e[1] + self.e[2] * self.e[2]
     }
@@ -52,6 +67,14 @@ impl Vec3 {
         const EPS: f64 = 1.0e-8;
         // Return true if the vector is close to zero in all dimensions
         self.e[0].abs() < EPS && self.e[1].abs() < EPS && self.e[2].abs() < EPS
+    }
+
+    pub fn any_component_less_than(&self, value: f64) -> bool {
+        self.x() < value || self.y() < value || self.z() < value
+    }
+
+    pub fn inverse_vec(&self, value: f64) -> Vec3 {
+        Vec3::new(value / self.x(),value / self.y(),value/ self.z())
     }
 }
  
@@ -65,6 +88,16 @@ impl Display for Vec3 {
     }
 }
  
+
+impl Index<usize> for Vec3 {
+    type Output = f64;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.e[index]
+    }
+}
+
+
 // -Vec3
 impl Neg for Vec3 {
     type Output = Vec3;
@@ -148,6 +181,7 @@ impl Div<f64> for Vec3 {
         Vec3::new(self.x() / t, self.y() / t, self.z() / t)
     }
 }
+
  
 pub fn dot(u: Vec3, v: Vec3) -> f64 {
     u.e[0] * v.e[0] + u.e[1] * v.e[1] + u.e[2] * v.e[2]

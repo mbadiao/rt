@@ -7,3 +7,5 @@ pub mod hittable_list;
 pub mod common;
 pub mod camera;
 pub mod material;
+pub mod cube;
+pub mod cylinder;
