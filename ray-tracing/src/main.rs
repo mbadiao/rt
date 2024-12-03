@@ -124,12 +124,12 @@ fn main() {
     // Image
 
     // Définit un ratio d’aspect de 16:9 (largeur/hauteur).
-    const ASPECT_RATIO: f64 = 3.0 / 2.0;
-    const IMAGE_WIDTH: i32 = 300;
+    const ASPECT_RATIO: f64 = 16.0 / 9.0;
+    const IMAGE_WIDTH: i32 = 600;
 
     //  Dimensions de l'image en pixels. Ici, largeur = 400 pixels, hauteur = 400/(16/9)=225 pixels.
     const IMAGE_HEIGHT: i32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as i32;
-    const SAMPLES_PER_PIXEL: i32 = 500;
+    const SAMPLES_PER_PIXEL: i32 = 50;
     const MAX_DEPTH: i32 = 50;
 
     // World
@@ -139,7 +139,7 @@ fn main() {
     let ground_material = Rc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
 
     // Other materials
-    let _metal_material = Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 0.3)); // gold-like metal
+    let metal_material = Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 0.3)); // gold-like metal
     let _glass_material = Rc::new(Dielectric::new(1.5));
     let _diffus_material = Rc::new(Lambertian::new(Color::new(0.2, 0.3, 0.4)));
 
@@ -188,7 +188,7 @@ fn main() {
         radius,
         height,
         axis,
-        cylinder_material,
+        metal_material,
     )));
 
     // Camera setup
