@@ -9,3 +9,4 @@ pub mod camera;
 pub mod material;
 pub mod cube;
 pub mod cylinder;
+pub mod light;

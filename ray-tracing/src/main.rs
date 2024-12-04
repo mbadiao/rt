@@ -5,6 +5,7 @@ use ray_tracing::shapes::common;
 use ray_tracing::shapes::cylinder::Cylinder;
 use ray_tracing::shapes::hittable::{HitRecord, Hittable};
 use ray_tracing::shapes::hittable_list::HittableList;
+use ray_tracing::shapes::light::Light;
 use ray_tracing::shapes::material::{Dielectric, Lambertian, Metal};
 use ray_tracing::shapes::ray::Ray;
 use ray_tracing::shapes::{cube::Cube, sphere::Sphere};
@@ -23,21 +24,40 @@ use std::rc::Rc;
 // (A+t⋅b−C)⋅(A+t⋅b−C)=R2
 // Cela revient à résoudre une équation quadratique pour t.
 
-fn ray_color(r: &Ray, world: &dyn Hittable, depth: i32) -> Color {
-    // If we've exceeded the ray bounce limit, no more light is gathered
+fn ray_color(r: &Ray, world: &dyn Hittable, lights: &[Light], depth: i32) -> Color {
     if depth <= 0 {
         return Color::new(0.0, 0.0, 0.0);
     }
 
     let mut rec = HitRecord::new();
-
     // Élimination de l'acné des ombres
     // Problème : Les rayons réfléchis peuvent heurter la surface d'origine à une distance proche de zéro (
     // t≈0), créant des artefacts visuels appelés acné des ombres.
     // Solution : Ignorer les collisions très proches de t=0.0
     // en utilisant une tolérance minimale (t>0.001).
-
     if world.hit(r, 0.001, common::INFINITY, &mut rec) {
+        // Couleur de base du matériau
+        let mut final_color = Color::new(0.0, 0.0, 0.0);
+
+        // Lumière ambiante
+        let ambient_strength = 0.1;
+        let ambient = rec.mat.as_ref().unwrap().get_color() * ambient_strength;
+        final_color += ambient;
+
+        // Contribution de chaque lumière
+        for light in lights {
+            let to_light = (light.position - rec.p).normalize();
+            let shadow_ray = Ray::new(rec.p + rec.normal * 0.001, to_light);
+            let mut shadow_rec = HitRecord::new();
+
+            // Vérification des ombres
+            if !world.hit(&shadow_ray, 0.001, common::INFINITY, &mut shadow_rec) {
+                let light_contribution = light.calculate_lighting(rec.p, rec.normal);
+                final_color += light_contribution * rec.mat.as_ref().unwrap().get_color();
+            }
+        }
+
+        // Réflexions/réfractions existantes
         let mut attenuation = Color::default();
         let mut scattered = Ray::default();
         if rec
@@ -46,11 +66,13 @@ fn ray_color(r: &Ray, world: &dyn Hittable, depth: i32) -> Color {
             .unwrap()
             .scatter(r, &rec, &mut attenuation, &mut scattered)
         {
-            return attenuation * ray_color(&scattered, world, depth - 1);
+            final_color += attenuation * ray_color(&scattered, world, lights, depth - 1);
         }
-        return Color::new(0.0, 0.0, 0.0);
+
+        return final_color;
     }
 
+    // Couleur du fond
     let unit_direction = vec3::unit_vector(r.direction());
     let t = 0.5 * (unit_direction.y() + 1.0);
     (1.0 - t) * Color::new(1.0, 1.0, 1.0) + t * Color::new(0.5, 0.7, 1.0)
@@ -207,6 +229,20 @@ fn main() {
         aperture,
         dist_to_focus,
     );
+    // Création des lumières
+    let lights = vec![
+        Light::new(
+            Point3::new(10.0, 10.0, 10.0), // Position
+            50.0,                          // Intensité
+            Color::new(1.0, 1.0, 1.0),     // Couleur blanche
+        ),
+        Light::new(
+            Point3::new(-10.0, 5.0, -10.0),
+            30.0,
+            Color::new(0.9, 0.8, 0.7), // Couleur chaude
+        ),
+    ];
+
     // Render
 
     print!("P3\n{} {}\n255\n", IMAGE_WIDTH, IMAGE_HEIGHT);
@@ -219,7 +255,7 @@ fn main() {
                 let u = (i as f64 + common::random_double()) / (IMAGE_WIDTH - 1) as f64;
                 let v = (j as f64 + common::random_double()) / (IMAGE_HEIGHT - 1) as f64;
                 let r = cam.get_ray(u, v);
-                pixel_color += ray_color(&r, &world, MAX_DEPTH);
+                pixel_color += ray_color(&r, &world, &lights, MAX_DEPTH);
             }
             color::write_color(&mut io::stdout(), pixel_color, SAMPLES_PER_PIXEL);
         }

@@ -1,7 +1,7 @@
 use super::color::Color;
 use super::hittable::HitRecord;
 use super::ray::Ray;
-use super::{vec3,common};
+use super::vec3::{self, dot, random_unit_vector, reflect, refract, Vec3};
 
 pub trait Material {
     fn scatter(
@@ -11,6 +11,7 @@ pub trait Material {
         attenuation: &mut Color,
         scattered: &mut Ray,
     ) -> bool;
+    fn get_color(&self) -> Color;
 }
 
 pub struct Lambertian {
@@ -39,6 +40,9 @@ impl Material for Lambertian {
         *attenuation = self.albedo;
         *scattered = Ray::new(rec.p, scatter_direction);
         true
+    }
+    fn get_color(&self) -> Color {
+           self.albedo
     }
 }
 
@@ -72,25 +76,29 @@ impl Material for Metal {
         *scattered = Ray::new(rec.p, reflected + self.fuzz * vec3::random_in_unit_sphere());
         vec3::dot(scattered.direction(), rec.normal) > 0.0
     }
+    fn get_color(&self) -> Color {
+           self.albedo
+    }
 }
 
  
 pub struct Dielectric {
     ir: f64, // Index of refraction
+    albedo: Color,
 }
  
 impl Dielectric {
     pub fn new(index_of_refraction: f64) -> Dielectric {
         Dielectric {
             ir: index_of_refraction,
+            albedo: Color::new(1.0, 1.0, 1.0),
         }
     }
 
     fn reflectance(cosine: f64, ref_idx: f64) -> f64 {
-        // Use Schlick's approximation for reflectance
-        let mut r0 = (1.0 - ref_idx) / (1.0 + ref_idx);
-        r0 = r0 * r0;
-        r0 + (1.0 - r0) * f64::powf(1.0 - cosine, 5.0)
+           let mut r0 = (1.0 - ref_idx) / (1.0 + ref_idx);
+           r0 = r0 * r0;
+           r0 + (1.0 - r0) * f64::powf(1.0 - cosine, 5.0)
     }
 }
  
@@ -114,7 +122,7 @@ impl Material for Dielectric {
  
         let cannot_refract = refraction_ratio * sin_theta > 1.0;
         let direction = if cannot_refract
-            || Self::reflectance(cos_theta, refraction_ratio) > common::random_double()
+            || Self::reflectance(cos_theta, refraction_ratio) >  super::common::random_double()
         {
             vec3::reflect(unit_direction, rec.normal)
         } else {
@@ -125,4 +133,7 @@ impl Material for Dielectric {
         *scattered = Ray::new(rec.p, direction);
         true
     }
+    fn get_color(&self) -> Color {
+           self.albedo
+     }
 }

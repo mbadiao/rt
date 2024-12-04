@@ -1,7 +1,7 @@
+use super::material::Material;
 use super::ray::Ray;
 use super::vec3::{self, Point3, Vec3};
 use std::rc::Rc;
-use super::material::Material;
 
 #[derive(Clone, Default)]
 pub struct HitRecord {
@@ -10,11 +10,19 @@ pub struct HitRecord {
     pub normal: Vec3,
     pub t: f64,
     pub front_face: bool,
+    pub ambient_light: f64,
 }
- 
+
 impl HitRecord {
     pub fn new() -> HitRecord {
-        Default::default()
+        HitRecord {
+            p: Point3::default(),
+            normal: Vec3::default(),
+            mat: None,
+            t: 0.0,
+            front_face: false,
+            ambient_light: 0.1, // Valeur par défaut pour la lumière ambiante
+        }
     }
 
     pub fn set_face_normal(&mut self, r: &Ray, outward_normal: Vec3) {
