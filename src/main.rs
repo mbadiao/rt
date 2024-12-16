@@ -10,6 +10,7 @@ use rt::world::*;
 use rt::cylindre::*;
 use rt::plane::*;
 use rt::sphere::*;
+use rt::cube::*;
 
 fn ray_color(ray: &Ray, world: &World, lights: &[Light]) -> Vec3 {
     let background_color = Vec3::new(0.5, 0.7, 1.0);
@@ -74,10 +75,18 @@ fn main() -> std::io::Result<()> {
         Vec3::new(0.5, 0.5, 0.5),
     )));
 
+    // Ajout d'un cube avec des dimensions plus visibles
+    world.add(Box::new(Cube::new(
+        Vec3::new(-1.0, -0.5, -2.0),    // Point minimum
+        Vec3::new(0.0, 0.5, -1.0),      // Point maximum
+        Vec3::new(0.8, 0.6, 0.2),       // Couleur (doré)
+    )));
+
     // Création des lumières
     let lights = vec![
-        // Light::new(Vec3::new(5.0, 5.0, -3.0), 0.8),
+        Light::new(Vec3::new(5.0, 5.0, -3.0), 0.8),
         Light::new(Vec3::new(-5.0, 5.0, -3.0), 0.6),
+        Light::new(Vec3::new(0.0, 5.0, 0.0), 0.4),
     ];
 
     //   let camera = Camera::new(
@@ -90,10 +99,10 @@ fn main() -> std::io::Result<()> {
 
     // plus haut
     let camera = Camera::new(
-        Vec3::new(0.0, 5.0, 0.0),  // Position de la caméra (au-dessus de la scène)
-        Vec3::new(0.0, 0.0, 0.0),  // Point regardé (centre de la scène)
-        Vec3::new(0.0, 0.0, -1.0), // Vecteur "up" de la caméra
-        90.0,                      // Champ de vision vertical
+        Vec3::new(40.0, 0.0, 50.0),  // Position de la caméra (au-dessus de la scène)
+        Vec3::new(5.0, 0.0, 0.0),  // Point regardé (centre de la scène)
+        Vec3::new(0.0, 1.0, 0.0), // Vecteur "up" de la caméra
+        10.0,// Champ de vision vertical
         (width as f64) / (height as f64),
     );
 
