@@ -53,27 +53,27 @@ fn main() -> std::io::Result<()> {
     //     0.5,
     //     Vec3::new(0.8, 0.3, 0.3),
     // )));
-    world.add(Box::new(Sphere::new(
-        Vec3::new(1.0, 0.0, -1.5),
-        0.3,
-        Vec3::new(0.3, 0.8, 0.3),
-    )));
+    // world.add(Box::new(Sphere::new(
+    //     Vec3::new(1.0, 0.0, -1.5),
+    //     0.8,
+    //     Vec3::new(1.0, 1.0, 0.0),
+    // )));
 
     // Ajout de cylindres
-    world.add(Box::new(Cylinder::new(
-        Vec3::new(0.0, -0.5, -3.0), // Base
-        Vec3::new(0.0, 1.0, 0.0),   // Axe parallèle à Y
-        0.5,                        // Rayon
-        1.0,                        // Hauteur
-        Vec3::new(0.3, 0.3, 0.8),   // Couleur
-    )));
+    // world.add(Box::new(Cylinder::new(
+    //     Vec3::new(0.0, -0.5, -3.0), // Base
+    //     Vec3::new(0.0, 1.0, 0.0),   // Axe parallèle à Y
+    //     0.5,                        // Rayon
+    //     1.0,                        // Hauteur
+    //     Vec3::new(0.3, 0.3, 0.8),   // Couleur
+    // )));
 
     // Ajout de plans
-    world.add(Box::new(Plane::new(
-        Vec3::new(0.0, -0.5, 0.0),
-        Vec3::new(0.0, 1.0, 0.0),
-        Vec3::new(0.5, 0.5, 0.5),
-    )));
+    // world.add(Box::new(Plane::new(
+    //     Vec3::new(0.0, -0.5, 0.0),
+    //     Vec3::new(0.0, 1.0, 0.0),
+    //     Vec3::new(0.5, 0.5, 0.5),
+    // )));
 
     // Ajout d'un cube avec des dimensions plus visibles
     world.add(Box::new(Cube::new(
@@ -87,6 +87,7 @@ fn main() -> std::io::Result<()> {
         Light::new(Vec3::new(5.0, 5.0, -3.0), 0.8),
         Light::new(Vec3::new(-5.0, 5.0, -3.0), 0.6),
         Light::new(Vec3::new(0.0, 5.0, 0.0), 0.4),
+        
     ];
 
     //   let camera = Camera::new(
@@ -96,15 +97,21 @@ fn main() -> std::io::Result<()> {
     //     90.0,
     //     (width as f64) / (height as f64),
     // );
-
-    // plus haut
     let camera = Camera::new(
-        Vec3::new(40.0, 0.0, 50.0),  // Position de la caméra (au-dessus de la scène)
-        Vec3::new(5.0, 0.0, 0.0),  // Point regardé (centre de la scène)
-        Vec3::new(0.0, 1.0, 0.0), // Vecteur "up" de la caméra
-        10.0,// Champ de vision vertical
+        Vec3::new(3.0, 2.0, 6.0),     // Position: légèrement en hauteur et en retrait
+        Vec3::new(0.0, 0.0, -1.0),    // Point de visée: centre de la scène
+        Vec3::new(0.0, 1.0, 0.0),     // Vecteur "up"
+        60.0,                         // Angle de champ plus large
         (width as f64) / (height as f64),
     );
+    // plus haut
+    // let camera = Camera::new(
+    //     Vec3::new(40.0, 0.0, 50.0),  // Position de la caméra (au-dessus de la scène)
+    //     Vec3::new(5.0, 0.0, 0.0),  // Point regardé (centre de la scène)
+    //     Vec3::new(0.0, 1.0, 0.0), // Vecteur "up" de la caméra
+    //     10.0,// Champ de vision vertical
+    //     (width as f64) / (height as f64),
+    // );
 
     for j in (0..height).rev() {
         for i in 0..width {
