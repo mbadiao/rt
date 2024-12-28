@@ -11,6 +11,7 @@ use rt::cylindre::*;
 use rt::plane::*;
 use rt::sphere::*;
 use rt::cube::*;
+use indicatif::{ProgressBar,ProgressStyle};
 
 // fn ray_color(ray: &Ray, world: &World, lights: &[Light]) -> Vec3 {
 //     let background_color = Vec3::new(0.5, 0.7, 1.0);
@@ -70,24 +71,14 @@ fn main() -> std::io::Result<()> {
 
     let mut file = File::create("world_scene.ppm")?;
     writeln!(file, "P3\n{} {}\n255", width, height)?;
-
+    // Creation de la barre de progression
+    let progress_bar = ProgressBar::new((height*width) as u64);
+    progress_bar.set_style(ProgressStyle::default_bar()
+    .template("[{elapsed_precise}] {bar:40.cyan/blue} {pos}/{len} pixels ({eta})")
+    .unwrap()
+    .progress_chars("=>-"));
     // Création du World et ajout des objets
     let mut world = World::new();
-
-  
-
-    // Ajout de plusieurs sphères
-    world.add(Box::new(Sphere::new(
-        Vec3::new(0.0, 0.0, -1.5),
-        0.5,
-        Vec3::new(0.8, 0.3, 0.3),
-    )));
-
-    world.add(Box::new(Sphere::new(
-        Vec3::new(0.0, 1.0, -1.5),
-        0.8,
-        Vec3::new(1.0, 1.0, 0.0),
-    )));
 
        // Ajout de plans
        world.add(Box::new(Plane::new(
@@ -96,6 +87,21 @@ fn main() -> std::io::Result<()> {
         Vec3::new(0.5, 0.5, 0.5),
     )));
 
+
+    // Ajout de plusieurs sphères
+    // world.add(Box::new(Sphere::new(
+    //     Vec3::new(0.0, 0.0, -1.5),
+    //     0.5,
+    //     Vec3::new(0.8, 0.3, 0.3),
+    // )));
+
+    world.add(Box::new(Sphere::new(
+        Vec3::new(0.0, 1.0, -1.5),
+        0.8,
+        Vec3::new(1.0, 1.0, 0.0),
+    )));
+
+    
     // Ajout de cylindres
     // world.add(Box::new(Cylinder::new(
     //     Vec3::new(0.0, -0.5, -3.0), // Base
@@ -105,25 +111,19 @@ fn main() -> std::io::Result<()> {
     //     Vec3::new(0.3, 0.3, 0.8),   // Couleur
     // )));
 
-    //Ajout de plans
-    world.add(Box::new(Plane::new(
-        Vec3::new(0.0, -0.5, 0.0),
-        Vec3::new(0.0, 1.0, 0.0),
-        Vec3::new(0.5, 0.5, 0.5),
-    )));
 
     // Ajout d'un cube avec des dimensions plus visibles
-    world.add(Box::new(Cube::new(
-        Vec3::new(-1.0, -1., -2.0),    // Point minimum
-        Vec3::new(0.0, 2., -1.0),      // Point maximum
-        Vec3::new(0.8, 0.6, 0.2),       // Couleur (doré)
-    )));
+    // world.add(Box::new(Cube::new(
+    //     Vec3::new(-1.0, -0.5, -2.0),    // Point minimum
+    //     Vec3::new(0.0, 0.5, -1.0),      // Point maximum
+    //     Vec3::new(0.8, 0.6, 0.2),       // Couleur (doré)
+    // )));
 
     // Création des lumières
     let lights = vec![
         Light::new(Vec3::new(5.0, 5.0, -3.0), 0.8),
-        // Light::new(Vec3::new(-5.0, 5.0, -3.0), 0.6),
-        // Light::new(Vec3::new(0.0, 5.0, 0.0), 0.4),
+        Light::new(Vec3::new(-5.0, 5.0, -3.0), 0.6),
+        Light::new(Vec3::new(0.0, 5.0, 0.0), 0.4),
     ];
 
     let camera = Camera::new(
@@ -153,6 +153,9 @@ fn main() -> std::io::Result<()> {
             let ib = (255.99 * pixel_color.z.sqrt()) as u8;
 
             writeln!(file, "{} {} {}", ir, ig, ib).unwrap();
+
+            // Incrémenter la barre de progression
+            progress_bar.inc(1);
         }
     }
     Ok(())
