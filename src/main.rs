@@ -47,17 +47,27 @@ fn main() -> std::io::Result<()> {
     // Création du World et ajout des objets
     let mut world = World::new();
 
+  
+
     // Ajout de plusieurs sphères
-    // world.add(Box::new(Sphere::new(
-    //     Vec3::new(0.0, 0.0, -1.0),
-    //     0.5,
-    //     Vec3::new(0.8, 0.3, 0.3),
-    // )));
-    // world.add(Box::new(Sphere::new(
-    //     Vec3::new(1.0, 0.0, -1.5),
-    //     0.8,
-    //     Vec3::new(1.0, 1.0, 0.0),
-    // )));
+    world.add(Box::new(Sphere::new(
+        Vec3::new(0.0, 0.0, -1.5),
+        0.5,
+        Vec3::new(0.8, 0.3, 0.3),
+    )));
+
+    world.add(Box::new(Sphere::new(
+        Vec3::new(0.0, 1.0, -1.5),
+        0.8,
+        Vec3::new(1.0, 1.0, 0.0),
+    )));
+
+       // Ajout de plans
+       world.add(Box::new(Plane::new(
+        Vec3::new(0.0, -0.5, 0.0),
+        Vec3::new(0.0, 1.0, 0.0),
+        Vec3::new(0.5, 0.5, 0.5),
+    )));
 
     // Ajout de cylindres
     // world.add(Box::new(Cylinder::new(
@@ -68,26 +78,21 @@ fn main() -> std::io::Result<()> {
     //     Vec3::new(0.3, 0.3, 0.8),   // Couleur
     // )));
 
-    // Ajout de plans
-    // world.add(Box::new(Plane::new(
-    //     Vec3::new(0.0, -0.5, 0.0),
-    //     Vec3::new(0.0, 1.0, 0.0),
-    //     Vec3::new(0.5, 0.5, 0.5),
-    // )));
+   
 
     // Ajout d'un cube avec des dimensions plus visibles
-    world.add(Box::new(Cube::new(
-        Vec3::new(-1.0, -0.5, -2.0),    // Point minimum
-        Vec3::new(0.0, 0.5, -1.0),      // Point maximum
-        Vec3::new(0.8, 0.6, 0.2),       // Couleur (doré)
-    )));
+    // world.add(Box::new(Cube::new(
+    //     Vec3::new(-1.0, -0.5, -2.0),    // Point minimum
+    //     Vec3::new(0.0, 0.5, -1.0),      // Point maximum
+    //     Vec3::new(0.8, 0.6, 0.2),       // Couleur (doré)
+    // )));
 
     // Création des lumières
     let lights = vec![
         Light::new(Vec3::new(5.0, 5.0, -3.0), 0.8),
         Light::new(Vec3::new(-5.0, 5.0, -3.0), 0.6),
         Light::new(Vec3::new(0.0, 5.0, 0.0), 0.4),
-        
+
     ];
 
     //   let camera = Camera::new(
