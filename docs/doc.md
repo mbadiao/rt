@@ -106,7 +106,7 @@ Fournit une structure pour manipuler les vecteurs 3D (position, direction, coule
 
 * unit_vector: Normalise un vecteur.
 
-## 4. light.rs
+### 4. light.rs
 
 ### Rôle
 
