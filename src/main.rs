@@ -12,18 +12,44 @@ use rt::plane::*;
 use rt::sphere::*;
 use rt::cube::*;
 
+// fn ray_color(ray: &Ray, world: &World, lights: &[Light]) -> Vec3 {
+//     let background_color = Vec3::new(0.5, 0.7, 1.0);
+
+//     match world.hit(ray, 0.001, f64::INFINITY) {
+//         Some(hit_record) => {
+//             let mut total_color = Vec3::new(0.0, 0.0, 0.0);
+
+//             for light in lights {
+//                 let light_color = calculate_lighting(&hit_record, light);
+//                 total_color = total_color.add(&light_color);
+//             }
+
+//             total_color
+//         }
+//         None => {
+//             let unit_direction = ray.direction;
+//             let t = 0.5 * (unit_direction.y + 1.0);
+//             background_color
+//                 .mul(1.0 - t)
+//                 .add(&Vec3::new(1.0, 1.0, 1.0).mul(t))
+//         }
+//     }
+// }
+
+
 fn ray_color(ray: &Ray, world: &World, lights: &[Light]) -> Vec3 {
     let background_color = Vec3::new(0.5, 0.7, 1.0);
-
+    
     match world.hit(ray, 0.001, f64::INFINITY) {
         Some(hit_record) => {
             let mut total_color = Vec3::new(0.0, 0.0, 0.0);
-
+            
             for light in lights {
-                let light_color = calculate_lighting(&hit_record, light);
+                // Passage du world en paramètre
+                let light_color = calculate_lighting(&hit_record, light, world);
                 total_color = total_color.add(&light_color);
             }
-
+            
             total_color
         }
         None => {
@@ -35,6 +61,7 @@ fn ray_color(ray: &Ray, world: &World, lights: &[Light]) -> Vec3 {
         }
     }
 }
+
 
 fn main() -> std::io::Result<()> {
     let width = 800;
@@ -68,35 +95,27 @@ fn main() -> std::io::Result<()> {
     //     Vec3::new(0.3, 0.3, 0.8),   // Couleur
     // )));
 
-    // Ajout de plans
-    // world.add(Box::new(Plane::new(
-    //     Vec3::new(0.0, -0.5, 0.0),
-    //     Vec3::new(0.0, 1.0, 0.0),
-    //     Vec3::new(0.5, 0.5, 0.5),
-    // )));
+    //Ajout de plans
+    world.add(Box::new(Plane::new(
+        Vec3::new(0.0, -0.5, 0.0),
+        Vec3::new(0.0, 1.0, 0.0),
+        Vec3::new(0.5, 0.5, 0.5),
+    )));
 
     // Ajout d'un cube avec des dimensions plus visibles
     world.add(Box::new(Cube::new(
-        Vec3::new(-1.0, -0.5, -2.0),    // Point minimum
-        Vec3::new(0.0, 0.5, -1.0),      // Point maximum
+        Vec3::new(-1.0, -1., -2.0),    // Point minimum
+        Vec3::new(0.0, 2., -1.0),      // Point maximum
         Vec3::new(0.8, 0.6, 0.2),       // Couleur (doré)
     )));
 
     // Création des lumières
     let lights = vec![
         Light::new(Vec3::new(5.0, 5.0, -3.0), 0.8),
-        Light::new(Vec3::new(-5.0, 5.0, -3.0), 0.6),
-        Light::new(Vec3::new(0.0, 5.0, 0.0), 0.4),
-        
+        // Light::new(Vec3::new(-5.0, 5.0, -3.0), 0.6),
+        // Light::new(Vec3::new(0.0, 5.0, 0.0), 0.4),
     ];
 
-    //   let camera = Camera::new(
-    //     Vec3::new(0.0, 0.0, 0.0),
-    //     Vec3::new(0.0, 0.0, -1.0),
-    //     Vec3::new(0.0, 1.0, 0.0),
-    //     90.0,
-    //     (width as f64) / (height as f64),
-    // );
     let camera = Camera::new(
         Vec3::new(3.0, 2.0, 6.0),     // Position: légèrement en hauteur et en retrait
         Vec3::new(0.0, 0.0, -1.0),    // Point de visée: centre de la scène
@@ -104,14 +123,8 @@ fn main() -> std::io::Result<()> {
         60.0,                         // Angle de champ plus large
         (width as f64) / (height as f64),
     );
-    // plus haut
-    // let camera = Camera::new(
-    //     Vec3::new(40.0, 0.0, 50.0),  // Position de la caméra (au-dessus de la scène)
-    //     Vec3::new(5.0, 0.0, 0.0),  // Point regardé (centre de la scène)
-    //     Vec3::new(0.0, 1.0, 0.0), // Vecteur "up" de la caméra
-    //     10.0,// Champ de vision vertical
-    //     (width as f64) / (height as f64),
-    // );
+
+
 
     for j in (0..height).rev() {
         for i in 0..width {
