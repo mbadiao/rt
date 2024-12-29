@@ -77,6 +77,10 @@ fn main() -> std::io::Result<()> {
     .template("[{elapsed_precise}] {bar:40.cyan/blue} {pos}/{len} pixels ({eta})")
     .unwrap()
     .progress_chars("=>-"));
+
+    // Création du monde avec des sphères aléatoires
+    // let world = World::random_spheres(); // Génère 20 sphères aléatoires
+
     // Création du World et ajout des objets
     let mut world = World::new();
 
@@ -88,7 +92,7 @@ fn main() -> std::io::Result<()> {
     )));
 
 
-    // Ajout de plusieurs sphères
+    // // Ajout de plusieurs sphères
     // world.add(Box::new(Sphere::new(
     //     Vec3::new(0.0, 0.0, -1.5),
     //     0.5,
@@ -96,28 +100,28 @@ fn main() -> std::io::Result<()> {
     // )));
 
     world.add(Box::new(Sphere::new(
-        Vec3::new(0.0, 1.0, -1.5),
+        Vec3::new(2.0, 0.28, -1.5),
         0.8,
         Vec3::new(1.0, 1.0, 0.0),
     )));
 
     
     // Ajout de cylindres
-    // world.add(Box::new(Cylinder::new(
-    //     Vec3::new(0.0, -0.5, -3.0), // Base
-    //     Vec3::new(0.0, 1.0, 0.0),   // Axe parallèle à Y
-    //     0.5,                        // Rayon
-    //     1.0,                        // Hauteur
-    //     Vec3::new(0.3, 0.3, 0.8),   // Couleur
-    // )));
+    world.add(Box::new(Cylinder::new(
+        Vec3::new(-2.0, -0.5, 2.0), // Base
+        Vec3::new(0.0, 1.0, 0.0),   // Axe parallèle à Y
+        0.5,                        // Rayon
+        1.0,                        // Hauteur
+        Vec3::new(0.3, 0.3, 0.8),   // Couleur
+    )));
 
 
     // Ajout d'un cube avec des dimensions plus visibles
-    // world.add(Box::new(Cube::new(
-    //     Vec3::new(-1.0, -0.5, -2.0),    // Point minimum
-    //     Vec3::new(0.0, 0.5, -1.0),      // Point maximum
-    //     Vec3::new(0.8, 0.6, 0.2),       // Couleur (doré)
-    // )));
+    world.add(Box::new(Cube::new(
+        Vec3::new(-1.0, -0.5, -2.0),    // Point minimum
+        Vec3::new(0.0, 0.5, -1.0),      // Point maximum
+        Vec3::new(0.8, 0.6, 0.2),       // Couleur (doré)
+    )));
 
     // Création des lumières
     let lights = vec![
@@ -133,6 +137,14 @@ fn main() -> std::io::Result<()> {
         60.0,                         // Angle de champ plus large
         (width as f64) / (height as f64),
     );
+   
+    // let camera = Camera::new(
+    //     Vec3::new(0.0, 1.2, 10.0),    // Position basse, plus reculée
+    //     Vec3::new(0.0, 1.0, -1.0),    // Légère inclinaison vers le bas
+    //     Vec3::new(0.0, 1.0, 0.0),     // Vecteur "up" standard
+    //     35.0,                          // Angle plus étroit pour un effet plus cinématographique
+    //     (width as f64) / (height as f64),
+    // );
 
 
 

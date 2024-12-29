@@ -1,5 +1,11 @@
+use rand::Rng;
+
+use crate::plane::Plane;
+use crate::sphere::Sphere;
+
 use super::hittable::*;
 use super::ray::*;
+use super::vec3::Vec3;
 
 pub struct World {
     pub objects: Vec<Box<dyn Hittable>>,
@@ -30,5 +36,21 @@ impl World {
         }
 
         closest_hit
+    }
+
+    pub fn random_spheres() -> Self {
+        let mut world = World::new();
+
+        // Sol gris clair
+        world.add(Box::new(Plane::new(
+            Vec3::new(0.0, -0.5, 0.0),
+            Vec3::new(0.0, 1.0, 0.0),
+            Vec3::new(0.8, 0.8, 0.8),
+        )));
+
+        // Ajout des grandes sphères dominantes
+      
+
+        world
     }
 }
