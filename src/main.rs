@@ -100,7 +100,7 @@ fn main() -> std::io::Result<()> {
     // )));
 
     world.add(Box::new(Sphere::new(
-        Vec3::new(2.0, 0.28, -1.5),
+        Vec3::new(2.5, 0.2, -1.0),
         0.8,
         Vec3::new(1.0, 1.0, 0.0),
     )));
@@ -108,7 +108,7 @@ fn main() -> std::io::Result<()> {
     
     // Ajout de cylindres
     world.add(Box::new(Cylinder::new(
-        Vec3::new(-2.0, -0.5, 2.0), // Base
+        Vec3::new(1.0, -0.5, 2.5), // Base
         Vec3::new(0.0, 1.0, 0.0),   // Axe parallèle à Y
         0.5,                        // Rayon
         1.0,                        // Hauteur
@@ -126,8 +126,8 @@ fn main() -> std::io::Result<()> {
     // Création des lumières
     let lights = vec![
         Light::new(Vec3::new(5.0, 5.0, -3.0), 0.8),
-        Light::new(Vec3::new(-5.0, 5.0, -3.0), 0.6),
-        Light::new(Vec3::new(0.0, 5.0, 0.0), 0.4),
+        // Light::new(Vec3::new(-5.0, 5.0, -3.0), 0.6),
+        // Light::new(Vec3::new(0.0, 5.0, 0.0), 0.4),
     ];
 
     let camera = Camera::new(
