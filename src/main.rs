@@ -1,3 +1,4 @@
+use std::f64::consts::PI;
 use std::fs::File;
 use std::io::Write;
 
@@ -7,6 +8,7 @@ use rt::ray::*;
 use rt::vec3::*;
 use rt::world::*;
 
+use rt::cube::*;
 use rt::cylindre::*;
 use rt::plane::*;
 use rt::sphere::*;
@@ -117,13 +119,29 @@ fn main() -> std::io::Result<()> {
 
 
     // Ajout d'un cube avec des dimensions plus visibles
-    world.add(Box::new(Cube::new(
-        Vec3::new(-1.0, -0.5, -2.0),    // Point minimum
-        Vec3::new(0.0, 0.5, -1.0),      // Point maximum
-        Vec3::new(0.8, 0.6, 0.2),       // Couleur (doré)
-    )));
+    let mut cube = Cube::new(
+        Vec3::new(-1.0, -0.5, -2.0), // Point minimum
+        Vec3::new(0.0, 0.5, -1.0),   // Point maximum
+        Vec3::new(0.8, 0.6, 0.2),    // Couleur (doré)
+    );
+    // Vecteur de déplacement : déplace le cube de 2 unités vers la droite et 1 unité vers le haut
+    let offset = Vec3::new(2.0, 1.0, 0.0);
+    cube.translate(offset);
+
+    world.add(Box::new(cube));
 
     // Création des lumières
+    // let lights = vec![
+    //     Light::new(Vec3::new(5.0, 5.0, -3.0), 0.8),
+    //     Light::new(Vec3::new(-5.0, 5.0, -3.0), 0.6),
+    // ];
+
+    // Création des lumières
+    // let lights = vec![
+    //     Light::new(Vec3::new(-10.0, 0.1, -10.0), 0.8), // Lumière rasante depuis l'horizon
+    //     Light::new(Vec3::new(10.0, 0.1, -10.0), 0.6),  // Autre lumière rasante pour équilibre
+    // ];
+
     let lights = vec![
         Light::new(Vec3::new(5.0, 5.0, -3.0), 0.8),
         // Light::new(Vec3::new(-5.0, 5.0, -3.0), 0.6),
