@@ -110,7 +110,9 @@ fn main() -> std::io::Result<()> {
     
     // Création des lumières
     let lights = vec![
-        Light::new(Vec3::new(5.0, 5.0, -3.0), 0.8),
+        Light::new(Vec3::new(5.0, 5.0, -3.0), // position de la lumière
+         0.8 // intensité de la lumière
+    ),
         // Light::new(Vec3::new(-5.0, 5.0, -3.0), 0.6),
         // Light::new(Vec3::new(0.0, 5.0, 0.0), 0.4),
     ];
