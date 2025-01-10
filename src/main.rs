@@ -1,30 +1,30 @@
-use std::fs::File;
-use std::f64::consts::PI;
-use std::io::Write;
+use indicatif::{ProgressBar, ProgressStyle};
 use rt::camera::*;
+use rt::cube::*;
+use rt::cylindre::*;
 use rt::light::*;
+use rt::plane::*;
 use rt::ray::*;
+use rt::sphere::*;
 use rt::vec3::*;
 use rt::world::*;
-use rt::cylindre::*;
-use rt::plane::*;
-use rt::sphere::*;
-use rt::cube::*;
-use indicatif::{ProgressBar,ProgressStyle};
+use std::f64::consts::PI;
+use std::fs::File;
+use std::io::Write;
 
 fn ray_color(ray: &Ray, world: &World, lights: &[Light]) -> Vec3 {
     let background_color = Vec3::new(0.5, 0.7, 1.0);
-    
+
     match world.hit(ray, 0.001, f64::INFINITY) {
         Some(hit_record) => {
             let mut total_color = Vec3::new(0.0, 0.0, 0.0);
-            
+
             for light in lights {
                 // Passage du world en paramètre
                 let light_color = calculate_lighting(&hit_record, light, world);
                 total_color = total_color.add(&light_color);
             }
-            
+
             total_color
         }
         None => {
@@ -43,17 +43,19 @@ fn main() -> std::io::Result<()> {
     let mut file = File::create("world_scene.ppm")?;
     writeln!(file, "P3\n{} {}\n255", width, height)?;
     // Creation de la barre de progression
-    let progress_bar = ProgressBar::new((height*width) as u64);
-    progress_bar.set_style(ProgressStyle::default_bar()
-    .template("[{elapsed_precise}] {bar:40.cyan/blue} {pos}/{len} pixels ({eta})")
-    .unwrap()
-    .progress_chars("=>-"));
+    let progress_bar = ProgressBar::new((height * width) as u64);
+    progress_bar.set_style(
+        ProgressStyle::default_bar()
+            .template("[{elapsed_precise}] {bar:40.cyan/blue} {pos}/{len} pixels ({eta})")
+            .unwrap()
+            .progress_chars("=>-"),
+    );
     // Création du monde avec des sphères aléatoires
     // let world = World::random_spheres(); // Génère 20 sphères aléatoires
     // Création du World et ajout des objets
     let mut world = World::new();
-       // Ajout de plans
-       world.add(Box::new(Plane::new(
+    // Ajout de plans
+    world.add(Box::new(Plane::new(
         Vec3::new(0.0, -0.5, 0.0),
         Vec3::new(0.0, 1.0, 0.0),
         Vec3::new(0.5, 0.5, 0.5),
@@ -69,7 +71,7 @@ fn main() -> std::io::Result<()> {
         0.2,
         Vec3::new(1.0, 1.0, 0.0),
     )));
-    
+
     // Ajout de cylindres
     // world.add(Box::new(Cylinder::new(
     //     Vec3::new(1.0, -0.5, 2.5), // Base
@@ -88,12 +90,12 @@ fn main() -> std::io::Result<()> {
 
     // world.add(Box::new(cube));
 
-    
     // Création des lumières
     let lights = vec![
-        Light::new(Vec3::new(5.0, 5.0, -3.0), // position de la lumière
-         0.8 // intensité de la lumière
-    ),
+        Light::new(
+            Vec3::new(5.0, 5.0, -5.0), // position de la lumière
+            0.8,                       // intensité de la lumière
+        ),
         // Light::new(Vec3::new(-5.0, 5.0, -3.0), 0.6),
         // Light::new(Vec3::new(0.0, 5.0, 0.0), 0.4),
     ];
@@ -105,7 +107,6 @@ fn main() -> std::io::Result<()> {
     //     (width as f64) / (height as f64),
     // );
 
-
     // Définir la caméra avec la position calculée
     // let camera = Camera::new(
     //     Vec3::new(0.0, 1.0, 5.0),  // Position de la caméra
@@ -115,15 +116,15 @@ fn main() -> std::io::Result<()> {
     //     (width as f64) / (height as f64),
     // );
     let camera = Camera::new(
-        Vec3::new(5.0, 5.0, -5.0),  // Position de la caméra
-        Vec3::new(0.0, 2.0, 0.0),  // Point visé
+        Vec3::new(5.0, 5.0, -5.0), // Position de la caméra
+        Vec3::new(0.0, 0.0, 0.0),  // Point visé
         Vec3::new(0.0, 1.0, 0.0),  // Vecteur "up"
         60.0,                      // Champ de vision
         (width as f64) / (height as f64),
     );
-    
+
     // camera.moves();
-   
+
     // let camera = Camera::new(
     //     Vec3::new(0.0, 1.2, 10.0),    // Position basse, plus reculée
     //     Vec3::new(0.0, 1.0, -1.0),    // Légère inclinaison vers le bas

@@ -69,19 +69,19 @@ pub fn calculate_lighting(hit_record: &HitRecord, light: &Light, world: &World) 
     let diffuse = hit_record.color.mul(diff * light.intensity);
 
     // Composante spéculaire - reflets brillants
-    // let view_direction = hit_record.point.mul(-1.0).normalize();
-    // let reflect_direction = reflect(&light_direction.mul(-1.0), &normal);
+    let view_direction = hit_record.point.mul(-1.0).normalize();
+    let reflect_direction = reflect(&light_direction.mul(-1.0), &normal);
     
-    // let specular_strength = 0.5;
-    // let shininess = 32.0;
-    // let spec = reflect_direction.dot(&view_direction)
-    //     .max(0.0)
-    //     .powf(shininess);
-    // let specular = Vec3::new(1.0, 1.0, 1.0)
-    //     .mul(spec * specular_strength * light.intensity);
+    let specular_strength = 0.5;
+    let shininess = 32.0;
+    let spec = reflect_direction.dot(&view_direction)
+        .max(0.0)
+        .powf(shininess);
+    let specular = Vec3::new(1.0, 1.0, 1.0)
+        .mul(spec * specular_strength * light.intensity);
 
     // Combinaison des trois composantes
-    ambient.add(&diffuse)
+    ambient.add(&diffuse).add(&specular)
 }
 
 fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
