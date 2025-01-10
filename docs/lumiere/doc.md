@@ -165,7 +165,7 @@ L'intensité peut être ajustée entre 0.0 et 1.0 :
 
 ## Exemples de Configuration
 
-### Scène Lumineuse
+### Scène Lumineuse avec deux luminosités
 ```rust
 let ambient_strength = 0.2;
 let specular_strength = 0.7;
