@@ -14,5 +14,5 @@ clean:
 # push
 push:
 	$(GIT) add .
-	$(GIT) commit -m "maj"
+	$(GIT) commit -m "projet finish"
 	$(GIT) push

@@ -143,3 +143,69 @@ let lights = vec![
 - **Shininess**: Exposant spéculaire
 - **Ray Casting**: Technique de lancer de rayons
 - **Dot Product**: Produit scalaire entre vecteurs
+
+# Guide de Contrôle de la Luminosité dans le Ray Tracer
+
+## Paramètres Principaux de Luminosité
+
+### 1. Intensité de la Lumière
+Pour ajuster la luminosité globale de la scène, vous pouvez modifier l'intensité des sources lumineuses :
+
+```rust
+Light::new(
+    Vec3::new(5.0, 5.0, -5.0), // Position
+    0.8,                       // Intensité (modifiez cette valeur)
+)
+```
+
+L'intensité peut être ajustée entre 0.0 et 1.0 :
+- 0.0 : Aucune lumière
+- 0.5 : Intensité moyenne
+- 1.0 : Intensité maximale
+
+## Exemples de Configuration
+
+### Scène Lumineuse
+```rust
+let ambient_strength = 0.2;
+let specular_strength = 0.7;
+let lights = vec![
+    Light::new(Vec3::new(5.0, 5.0, -5.0), 0.9),
+    Light::new(Vec3::new(-5.0, 5.0, -3.0), 0.7),
+];
+```
+
+### Scène Sombre
+```rust
+let ambient_strength = 0.05;
+let specular_strength = 0.3;
+let lights = vec![
+    Light::new(Vec3::new(5.0, 5.0, -5.0), 0.4),
+];
+```
+
+### Scène Équilibrée
+```rust
+let ambient_strength = 0.1;
+let specular_strength = 0.5;
+let lights = vec![
+    Light::new(Vec3::new(5.0, 5.0, -5.0), 0.8),
+    Light::new(Vec3::new(-5.0, 5.0, -3.0), 0.6),
+];
+```
+
+## Bonnes Pratiques
+
+1. Commencez par ajuster l'intensité des lumières avant de modifier les autres paramètres
+2. Maintenez un équilibre entre l'éclairage ambiant et les ombres pour un rendu réaliste
+3. Ajustez la correction gamma en dernier pour affiner le rendu final
+4. Testez différentes configurations avec des échantillons réduits pour des itérations rapides
+5. Considérez l'ajout de plusieurs sources lumineuses pour un éclairage plus naturel
+
+## Dépannage
+
+Si votre scène apparaît :
+- Trop sombre : Augmentez l'intensité des lumières ou l'éclairage ambiant
+- Trop claire : Réduisez l'intensité des lumières ou augmentez la puissance gamma
+- Manque de contraste : Ajustez la correction gamma ou augmentez la force spéculaire
+- Ombres trop dures : Augmentez l'éclairage ambiant ou ajoutez des lumières secondaires

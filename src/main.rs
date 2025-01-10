@@ -59,6 +59,7 @@ fn main() -> std::io::Result<()> {
         Vec3::new(0.0, 1.0, 0.0),
         Vec3::new(0.8, 0.8, 0.8),
     )));
+    // ajout du plan orienter YZ
     let wall = Plane::new(
         Vec3::new(-4.0, 0.0, 0.0),  // Point sur le plan (mur positionné à x = -4.0)
         Vec3::new(1.0, 0.0, 0.0),   // Normal du plan (pointant vers la droite)
@@ -113,24 +114,16 @@ fn main() -> std::io::Result<()> {
     ];
  
 
-    // Définir la caméra avec la position calculée
+    // Définir la caméra 
 
     let camera = Camera::new(
         Vec3::new(0.1, 1.0, 6.0), // Position de la caméra
         Vec3::new(0.0, 0.0, 0.0),  // Point visé
         Vec3::new(0.0, 1.0, 0.0),  // Vecteur "up"
         60.0,                      // Champ de vision
-        (width as f64) / (height as f64),
+        (width as f64) / (height as f64),// ratio
     );
 
-    // let camera = Camera::new(
-    //     Vec3::new(1.0, 2.0, 6.0),     // Position: légèrement en hauteur et en retrait
-    //     Vec3::new(0.0, 0.0, -1.0),    // Point de visée: centre de la scène
-    //     Vec3::new(0.0, 1.0, 0.0),     // Vecteur "up"
-    //     60.0,                         // Angle de champ plus large
-    //     (width as f64) / (height as f64),
-    // );
-   
     
     for j in (0..height).rev() {
         for i in 0..width {
