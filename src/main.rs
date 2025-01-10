@@ -50,16 +50,22 @@ fn main() -> std::io::Result<()> {
             .unwrap()
             .progress_chars("=>-"),
     );
-    // Création du monde avec des sphères aléatoires
-    // let world = World::random_spheres(); // Génère 20 sphères aléatoires
+
     // Création du World et ajout des objets
     let mut world = World::new();
     // Ajout de plans
     world.add(Box::new(Plane::new(
         Vec3::new(0.0, -0.5, 0.0),
         Vec3::new(0.0, 1.0, 0.0),
-        Vec3::new(0.5, 0.5, 0.5),
+        Vec3::new(0.8, 0.8, 0.8),
     )));
+    let wall = Plane::new(
+        Vec3::new(-4.0, 0.0, 0.0),  // Point sur le plan (mur positionné à x = -4.0)
+        Vec3::new(1.0, 0.0, 0.0),   // Normal du plan (pointant vers la droite)
+        Vec3::new(0.8, 0.3, 0.3),   // Couleur (rouge pâle)
+    );
+    world.add(Box::new(wall));
+    
     // // Ajout de plusieurs sphères
     // world.add(Box::new(Sphere::new(
     //     Vec3::new(0.0, 0.0, -1.5),
@@ -67,28 +73,34 @@ fn main() -> std::io::Result<()> {
     //     Vec3::new(0.8, 0.3, 0.3),
     // )));
     world.add(Box::new(Sphere::new(
-        Vec3::new(0.0, 2.0, 0.0),
-        0.2,
+        Vec3::new(1.0, 1.5, 0.0),
+        0.5,
         Vec3::new(1.0, 1.0, 0.0),
     )));
 
-    // Ajout de cylindres
-    // world.add(Box::new(Cylinder::new(
-    //     Vec3::new(1.0, -0.5, 2.5), // Base
-    //     Vec3::new(0.0, 1.0, 0.0),   // Axe parallèle à Y
-    //     0.5,                        // Rayon
-    //     1.0,                        // Hauteur
-    //     Vec3::new(0.3, 0.3, 0.8),   // Couleur
-    // )));
-    // Ajout d'un cube avec des dimensions plus visibles
-    // let mut cube =  Cube::new(
-    //     Vec3::new(-1.0, -0.5, -2.0),    // Point minimum
-    //     Vec3::new(0.0, 0.5, -1.0),      // Point maximum
-    //     Vec3::new(0.8, 0.6, 0.2),       // Couleur (doré)
-    // );
-    // cube.rotate_y(PI/2.0);
+    world.add(Box::new(Sphere::new(
+        Vec3::new(0.0, 0.0, 0.0),
+        0.09,
+        Vec3::new(0.0, 0.0, 0.0),
+    )));
 
-    // world.add(Box::new(cube));
+    // Ajout de cylindres
+    world.add(Box::new(Cylinder::new(
+        Vec3::new(4.0, 0.0, -3.0), // Base
+        Vec3::new(1.0, 0.0, 0.0),   // Axe parallèle à Y
+        0.5,                        // Rayon
+        1.0,                        // Hauteur
+        Vec3::new(0.3, 0.3, 0.8),   // Couleur
+    )));
+    // Ajout d'un cube avec des dimensions plus visibles
+    let mut cube =  Cube::new(
+        Vec3::new(-1.0, -0.5, -2.0),    // Point minimum
+        Vec3::new(0.0, 0.5, -1.0),      // Point maximum
+        Vec3::new(0.8, 0.6, 0.2),       // Couleur (doré)
+    );
+    cube.rotate_y(PI/2.0);
+
+    world.add(Box::new(cube));
 
     // Création des lumières
     let lights = vec![
@@ -99,39 +111,27 @@ fn main() -> std::io::Result<()> {
         // Light::new(Vec3::new(-5.0, 5.0, -3.0), 0.6),
         // Light::new(Vec3::new(0.0, 5.0, 0.0), 0.4),
     ];
-    // let camera = Camera::new(
-    //     Vec3::new(3.0, 2.0, 6.0),     // Position: légèrement en hauteur et en retrait
-    //     Vec3::new(0.0, 0.0, -1.0),    // Point de visée: centre de la scène
-    //     Vec3::new(0.0, 1.0, 0.0),     // Vecteur "up"
-    //     60.0,                         // Angle de champ plus large
-    //     (width as f64) / (height as f64),
-    // );
+ 
 
     // Définir la caméra avec la position calculée
-    // let camera = Camera::new(
-    //     Vec3::new(0.0, 1.0, 5.0),  // Position de la caméra
-    //     Vec3::new(0.0, 0.0, 0.0),  // Point visé
-    //     Vec3::new(0.0, 1.0, 0.0),  // Vecteur "up"
-    //     60.0,                      // Champ de vision
-    //     (width as f64) / (height as f64),
-    // );
+
     let camera = Camera::new(
-        Vec3::new(5.0, 5.0, -5.0), // Position de la caméra
+        Vec3::new(0.1, 1.0, 6.0), // Position de la caméra
         Vec3::new(0.0, 0.0, 0.0),  // Point visé
         Vec3::new(0.0, 1.0, 0.0),  // Vecteur "up"
         60.0,                      // Champ de vision
         (width as f64) / (height as f64),
     );
 
-    // camera.moves();
-
     // let camera = Camera::new(
-    //     Vec3::new(0.0, 1.2, 10.0),    // Position basse, plus reculée
-    //     Vec3::new(0.0, 1.0, -1.0),    // Légère inclinaison vers le bas
-    //     Vec3::new(0.0, 1.0, 0.0),     // Vecteur "up" standard
-    //     35.0,                          // Angle plus étroit pour un effet plus cinématographique
+    //     Vec3::new(1.0, 2.0, 6.0),     // Position: légèrement en hauteur et en retrait
+    //     Vec3::new(0.0, 0.0, -1.0),    // Point de visée: centre de la scène
+    //     Vec3::new(0.0, 1.0, 0.0),     // Vecteur "up"
+    //     60.0,                         // Angle de champ plus large
     //     (width as f64) / (height as f64),
     // );
+   
+    
     for j in (0..height).rev() {
         for i in 0..width {
             let mut pixel_color = Vec3::new(0.0, 0.0, 0.0);
