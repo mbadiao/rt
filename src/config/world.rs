@@ -34,23 +34,22 @@ impl World {
                 }
             }
         }
-
         closest_hit
     }
 
-    pub fn random_spheres() -> Self {
-        let mut world = World::new();
+    // pub fn random_spheres() -> Self {
+    //     let mut world = World::new();
 
-        // Sol gris clair
-        world.add(Box::new(Plane::new(
-            Vec3::new(0.0, -0.5, 0.0),
-            Vec3::new(0.0, 1.0, 0.0),
-            Vec3::new(0.8, 0.8, 0.8),
-        )));
+    //     // Sol gris clair
+    //     world.add(Box::new(Plane::new(
+    //         Vec3::new(0.0, -0.5, 0.0),
+    //         Vec3::new(0.0, 1.0, 0.0),
+    //         Vec3::new(0.8, 0.8, 0.8),
+    //     )));
 
-        // Ajout des grandes sphères dominantes
+    //     // Ajout des grandes sphères dominantes
       
 
-        world
-    }
+    //     world
+    // }
 }
