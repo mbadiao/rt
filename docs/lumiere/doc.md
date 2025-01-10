@@ -194,18 +194,117 @@ let lights = vec![
 ];
 ```
 
+
+# Documentation du Système d'Ombres
+
+
+![Shadow Ray Explanation](./light.svg)
+
+
+## Vue d'ensemble du Système
+
+Le système d'ombres implémenté dans ce ray tracer utilise la technique du shadow ray (rayon d'ombre) pour déterminer si un point est dans l'ombre. Cette méthode simule le comportement naturel de la lumière en vérifiant si des objets bloquent le chemin entre un point et une source lumineuse.
+
+## Implémentation Détaillée
+
+### Création du Shadow Ray
+
+```rust
+let shadow_ray_direction = light.position.sub(&hit_record.point);
+let shadow_ray_distance = shadow_ray_direction.length();
+let shadow_ray = Ray {
+    origin: hit_record.point.add(&hit_record.normal.mul(0.001)),
+    direction: shadow_ray_direction.normalize(),
+};
+```
+
+#### Paramètres Clés
+- `origin` : Point de départ légèrement décalé de la surface
+- `direction` : Vecteur normalisé pointant vers la source lumineuse
+- `shadow_ray_distance` : Distance jusqu'à la source lumineuse
+
+### Vérification des Ombres
+
+```rust
+if let Some(_shadow_hit) = world.hit(&shadow_ray, 0.001, shadow_ray_distance) {
+    return hit_record.color.mul(0.1);
+}
+```
+
+#### Paramètres de Détection
+- `0.001` : Distance minimale pour éviter l'auto-intersection
+- `shadow_ray_distance` : Distance maximale de recherche
+- `0.1` : Facteur d'assombrissement pour les zones d'ombre
+
+## Aspects Techniques Importants
+
+### Offset de Surface
+L'offset de 0.001 unités (`normal.mul(0.001)`) est crucial pour :
+- Éviter les artefacts d'acné d'ombre
+- Prévenir les auto-intersections
+- Assurer une détection précise des ombres
+
+### Distance de Test
+La vérification entre `0.001` et `shadow_ray_distance` permet de :
+- Ignorer les objets derrière la source lumineuse
+- Optimiser les calculs d'intersection
+- Obtenir des ombres précises
+
+## Ajustements et Optimisations
+
+### Intensité des Ombres
+Pour modifier l'obscurité des zones d'ombre :
+```rust
+return hit_record.color.mul(0.1); // Modifiez cette valeur
+```
+- 0.0 : Ombres totalement noires
+- 0.1 : Ombres douces (valeur par défaut)
+- 0.2 : Ombres plus claires
+
+### Précision de Détection
+Pour ajuster la précision de la détection :
+```rust
+world.hit(&shadow_ray, 0.001, shadow_ray_distance) // Modifiez le 0.001
+```
+- Diminuer : Plus précis mais risque d'acné d'ombre
+- Augmenter : Moins précis mais plus stable
+
 ## Bonnes Pratiques
 
-1. Commencez par ajuster l'intensité des lumières avant de modifier les autres paramètres
-2. Maintenez un équilibre entre l'éclairage ambiant et les ombres pour un rendu réaliste
-3. Ajustez la correction gamma en dernier pour affiner le rendu final
-4. Testez différentes configurations avec des échantillons réduits pour des itérations rapides
-5. Considérez l'ajout de plusieurs sources lumineuses pour un éclairage plus naturel
+### Performance
+1. Utilisez des structures d'accélération pour les tests d'intersection
+2. Limitez le nombre de sources lumineuses
+3. Optimisez la distance de test pour chaque rayon d'ombre
 
-## Dépannage
+### Qualité Visuelle
+1. Ajustez l'offset de surface selon l'échelle de votre scène
+2. Équilibrez l'intensité des ombres avec l'éclairage ambiant
+3. Considérez l'ajout de soft shadows pour plus de réalisme
 
-Si votre scène apparaît :
-- Trop sombre : Augmentez l'intensité des lumières ou l'éclairage ambiant
-- Trop claire : Réduisez l'intensité des lumières ou augmentez la puissance gamma
-- Manque de contraste : Ajustez la correction gamma ou augmentez la force spéculaire
-- Ombres trop dures : Augmentez l'éclairage ambiant ou ajoutez des lumières secondaires
+## Résolution des Problèmes Courants
+
+### Artefacts d'Ombre
+Si vous observez des points noirs ou des motifs étranges :
+1. Augmentez légèrement l'offset de surface
+2. Vérifiez la normalisation des vecteurs
+3. Ajustez les distances minimales et maximales de test
+
+### Ombres Manquantes
+Si certaines ombres ne s'affichent pas :
+1. Vérifiez les distances de test
+2. Confirmez la direction du shadow ray
+3. Assurez-vous que tous les objets sont testés pour l'intersection
+
+## Extensions Possibles
+
+### Soft Shadows
+Pour améliorer le réalisme, vous pourriez :
+1. Implémenter des sources lumineuses surfaciques
+2. Utiliser plusieurs shadow rays par point
+3. Moyenner les résultats pour des ombres douces
+
+### Optimisations Avancées
+Considérez l'implémentation de :
+1. Hiérarchies de volumes englobants (BVH)
+2. Tests d'intersection précoces
+3. Parallélisation des calculs d'ombre
